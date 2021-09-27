@@ -1,0 +1,23 @@
+version: "3.3"
+services:
+#API Container
+  api:
+    build: .
+    ports: 
+      - "8080:8080"
+
+  vault:
+    image: vault:latest
+    volumes:
+      - ./Vault/config:/vault/config
+      - ./Vault/policies:/vault/policies
+      - ./Vault/data:/vault/data
+    ports:
+      - "8200:8200"
+    environment:
+      - VAULT_ADDR=http://0.0.0.0:8200
+      - VAULT_API=http://0.0.0.0:8200
+      - VAULT_ADDRESS=http://0.0.0.0:8200
+    cap_add:
+      - IPC_LOCK
+    command: vault server -config=/vault/config/vault.json

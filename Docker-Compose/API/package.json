@@ -1,0 +1,13 @@
+{
+    "name": "api-workshop-epsi",
+    "version": "1.0.0",
+    "description": "API Workshop I1 Epsi 2021",
+    "author": "Victor Martin - victor.martin3@epsi.fr",
+    "main": "server.js",
+    "scripts": {
+      "start": "node server.js"
+    },
+    "dependencies": {
+      "express": "^4.16.1"
+    }
+  }
