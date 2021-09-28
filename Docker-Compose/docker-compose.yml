@@ -7,7 +7,7 @@ services:
       - "8080:8080"
 
   vault:
-    image: vault:latest
+    image: "vault:${vVault}"
     volumes:
       - ./Vault/config:/vault/config
       - ./Vault/policies:/vault/policies
@@ -21,3 +21,13 @@ services:
     cap_add:
       - IPC_LOCK
     command: vault server -config=/vault/config/vault.json
+
+  mongo:
+    image: "mongo:${vMongo}"
+    volumes:
+      - ./Mongo/data/db:/data/db
+    ports:
+      - "27017:27017"
+    environment:
+      - "MONGO_INITDB_ROOT_USERNAME:${RootID}"
+      - "MONGO_INITDB_ROOT_PASSWORD:${RootPwd}"

@@ -15,11 +15,3 @@ path "sys/mounts" {
 path "transit/*" {
     capabilities = [ "create", "read", "update", "delete", "list" ]
 }
-
-path "transit/encrypt/order-key" {
-    capabilities = [ "update" ]
-}
-
-path "transit/decrypt/order-key" {
-    capabilities = [ "update" ]
-}
