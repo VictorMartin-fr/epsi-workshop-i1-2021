@@ -1,17 +1,17 @@
 path "transit/encrypt/orders" {
-    capabilities = [ "update" ]
+   capabilities = [ "update" ]
 }
 
 path "transit/decrypt/orders" {
-    capabilities = [ "update" ]
+   capabilities = [ "update" ]
 }
 
 # List existing keys in UI
 path "transit/keys" {
- 		capabilities = [ "list" ] 
+   capabilities = [ "list" ]
 }
 
 # Enable to select the orders key in UI
 path "transit/keys/orders" {
-    capabilities = [ "read" ]
+   capabilities = [ "read" ]
 }
