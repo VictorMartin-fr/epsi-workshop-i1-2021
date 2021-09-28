@@ -2,10 +2,10 @@ version: "3.3"
 services:
 #API Container
   api:
-    build: .
+    build: ./API/
     ports: 
       - "8080:8080"
-
+#Vault Container
   vault:
     image: "vault:${vVault}"
     volumes:
@@ -21,7 +21,7 @@ services:
     cap_add:
       - IPC_LOCK
     command: vault server -config=/vault/config/vault.json
-
+#Mongo Container
   mongo:
     image: "mongo:${vMongo}"
     volumes:
@@ -31,3 +31,9 @@ services:
     environment:
       - "MONGO_INITDB_ROOT_USERNAME:${RootID}"
       - "MONGO_INITDB_ROOT_PASSWORD:${RootPwd}"
+#NGINX Container
+  nginx:
+    build: ./FrontEnd/
+    ports:
+      - "80:80"
+      - "443:443"

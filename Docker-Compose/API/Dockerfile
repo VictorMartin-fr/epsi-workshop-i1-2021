@@ -5,11 +5,11 @@ FROM node:latest
 WORKDIR /usr/src/app
 
 #Install dependencies
-COPY API/package*.json ./
+COPY ./sources/package*.json ./
 RUN npm install
 
 #Deplace application
-COPY API/. .
+COPY ./sources/ .
 
 #Expose Port
 EXPOSE 8080
