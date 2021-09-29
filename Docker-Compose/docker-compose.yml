@@ -1,10 +1,12 @@
 version: "3.3"
+
 services:
 #API Container
   api:
+    container_name: api
     build: ./API/
-    ports: 
-      - "8080:8080"
+    expose:
+      - 8080
 #Vault Container
   vault:
     image: "vault:${vVault}"
@@ -32,13 +34,11 @@ services:
       - "MONGO_INITDB_ROOT_USERNAME:${RootID}"
       - "MONGO_INITDB_ROOT_PASSWORD:${RootPwd}"
 #NGINX Container
-  nginx:
+  web1:
     container_name: web1
     build: ./FrontEnd/
-    ports:
-      - "3001:80"
-    networks:
-      - frontend
+    expose:
+      - 80
 #LoadBalancer Front
   haproxy:
     image: haproxy:latest
@@ -47,9 +47,5 @@ services:
     ports:
       - "80:80"
       - "443:443"
-    networks:
-      - frontend
-
-networks:
-  frontend:
-    driver: bridge
+    expose:
+      - 80
