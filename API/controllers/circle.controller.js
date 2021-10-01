@@ -2,8 +2,13 @@ const mongoose = require("mongoose");
 const db = require("../models");
 const Circle = db.circles;
 
+const vault = require("../vaultRequest/vaultRequest")
+
+const encryptMode = "encrypt"
+const decryptMode = "decrypt"
+
 // Create and Save a new circle
-exports.create = (req, res) => {
+exports.create = async (req, res) => {
     // Validate request
     if (!req.body.name) {
         res.status(400).send({
@@ -14,7 +19,7 @@ exports.create = (req, res) => {
 
     // Create a circle
     const circle = new Circle({
-        name: req.body.name,
+        name: await vault.useVault(encryptMode,req.body.name),
         members: req.body.members,
         messages: [],
         owner: req.body.owner,
@@ -38,7 +43,7 @@ exports.create = (req, res) => {
 };
 
 // Retrieve all circles from the database.
-exports.findAll = (req, res) => {
+exports.findAll = async (req, res) => {
     const name = req.query.name;
     var condition = name ? {
         name: {
@@ -48,8 +53,22 @@ exports.findAll = (req, res) => {
     } : {};
 
     Circle.find(condition)
-        .then(data => {
-            res.send(data);
+        .then(async data => {
+            var result = []
+            Promise.all(data.map(async (element) =>{
+                var tmpData = element._doc
+                tmpData.name = await vault.useVault(decryptMode,tmpData.name)
+                var messagesResult = [];
+                await Promise.all(tmpData.messages.map(async (content) =>{
+                    var tmpMessage = content;
+                    tmpMessage.content = await vault.useVault(decryptMode,tmpMessage.content);
+                    messagesResult.push(tmpMessage);
+                }));
+                tmpData.messages = messagesResult
+                result.push(tmpData)
+            })).then(()=>{
+                res.send(result);
+            });
         })
         .catch(err => {
             res.status(500).send({
@@ -59,16 +78,27 @@ exports.findAll = (req, res) => {
 };
 
 // Find a single circle with an id
-exports.findOne = (req, res) => {
+exports.findOne = async (req, res) => {
     const id = req.params.id;
 
     Circle.findById(id)
-        .then(data => {
-            if (!data)
+        .then(async data => {
+            if (!data){
                 res.status(404).send({
                     message: "Not found circle with id " + id
                 });
-            else res.send(data);
+            }else{
+                var result = data._doc
+                result.name = await vault.useVault(decryptMode,result.name)
+                var tmpMessages = [];
+                Promise.all(result.messages.map(async (element) => {
+                    var tmpMessage = element
+                    tmpMessage.content = await vault.useVault(decryptMode,tmpMessage.content)
+                    tmpMessages.push(tmpMessage);
+                })).then(()=>{
+                    res.send(result)
+                });
+            };
         })
         .catch(err => {
             res
@@ -172,7 +202,7 @@ exports.purge = (req, res) => {
 };
 
 // Add a message in a circle
-exports.addMsg = (req, res) => {
+exports.addMsg = async (req, res) => {
     if (!req.body) {
         return res.status(400).send({
             message: "Data to update can not be empty!"
@@ -197,9 +227,12 @@ exports.addMsg = (req, res) => {
                 .send({
                     message: "Error retrieving circle with id=" + id
                 });
-        }).then(() => {
+        }).then(async () => {
             console.log(messages);
-            messages.push(req.body);
+            var msgToSend = req.body
+
+            msgToSend.content = await vault.useVault(encryptMode,msgToSend.content);
+            messages.push(msgToSend);
             messages = {
                 "messages": messages
             }

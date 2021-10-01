@@ -63,9 +63,9 @@ const requestVault = function(mode, msg){
     req.end();
   })
   
-}
+};
 
-const useVault = async function(mode,msg){
+exports.useVault = async function(mode,msg){
   var res = undefined
     res = await requestVault(mode,msg).then(function(result){
         return JSON.parse(result)
@@ -76,7 +76,7 @@ const useVault = async function(mode,msg){
       return res.data.ciphertext
     }
   
-}
+};
 
 //Exemple to use vault
 /*const main = async function(){
